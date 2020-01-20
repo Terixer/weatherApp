@@ -1,0 +1,16 @@
+doctype html  
+html  
+  head
+    title My Blog
+    link(rel='stylesheet', href='/css/style.css')
+    link(rel='stylesheet', href='https://fonts.googleapis.com/css?family=Righteous&display=swap')
+  body
+    #app
+      h1= title
+      a(href='/') Weather
+      a(href='/about') About
+      a(href='/help') Help
+      hr
+      .container
+        block content
+  script(src='/js/script.js')

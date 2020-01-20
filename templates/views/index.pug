@@ -1,0 +1,22 @@
+extends ../partials/base.pug
+block content
+    form#weather-form
+        input(type='text',placeholder='City in english',name='address')
+        select(name='units')
+            option(value='ca',selected=true) Europan
+            option(value='us') Imprerial
+        button(type='submit') Submit
+
+    div.message.hide
+    div.weather-message.hide
+        | Location : 
+        span.location
+        br
+        | Current temperature : 
+        span.current-temperature
+        br
+        | Apparent Temperature : 
+        span.apparent-temperature
+        br
+        | Pressure : 
+        span.pressure

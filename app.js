@@ -1,52 +1,62 @@
-const request = require('request');
-const geocode = require('./geocode.js');
+const geocode = require('./src/geocode.js');
+const weather = require('./src/weather.js');
+const express = require('express');
+const path = require('path');
 
-const address = process.argv[2];
-const units = process.argv[3];
+const publicDirectory = './public';
+const viewsDirectory = './templates';
 
 
-const getWeater = (moment = 'currently', units = 'ca') => {
-    return (geoCode) => {
-        const weaterUrl = `https://api.darksky.net/forecast/1728a4a04f31884ca9ce06ba9771a30d/${geoCode.latitude},${geoCode.longitude}?units=${units}&lang=pl`
-        return new Promise((resolve, reject) => {
-            request({
-                url: weaterUrl,
-                json: true
-            }, (err, response) => {
-                const weaterData = response.body[moment];
-                const unitShortcut = determineUnits(units);
-                resolve({
-                    weaterData: weaterData,
-                    unitShortcut: unitShortcut
-                });
+const app = express()
+app.set('view engine', 'pug')
+app.set('views', viewsDirectory)
+
+app.use(express.static(publicDirectory))
+
+app.get('/', function (req, res) {
+
+    return res.render('views/index', { title: 'Weather' })
+});
+
+
+app.get('/weather', function (req, res) {
+    const address = req.query.address;
+    const units = req.query.units || 'ca';
+    if (!address) {
+        return res.send({
+            error: "Query must contain the address"
+        });
+    }
+    geocode.getGeoCode(address)
+        .then((weather.getWeater('currently', units)))
+        .then((data) => {
+            const { weaterData, unitsShortcut } = data;
+
+            return res.send({
+                weaterData,
+                unitsShortcut,
+                address
             });
         })
-    }
-}
+        .catch((error) => {
+            return res.send({
+                error
+            });
+        });
 
-const determineUnits = (units) => {
-    switch (units) {
-        case 'ca':
-        case 'uk2':
-            return '*C';
-        case 'us':
-            return '*F';
-        default:
-            console.log('Sorry, we are out of ' + units + '.');
-            return '';
-    }
-}
+});
 
-geocode.getGeoCode(address)
-    .then((getWeater('currently', units)))
-    .then((data) => {
-        console.log(`Realna temperatura: ${data.weaterData.temperature} ${data.unitShortcut}`);
-        console.log(`Odczuwalna temperatura: ${data.weaterData.apparentTemperature} ${data.unitShortcut}`);
-        console.log(`${data.weaterData.precipProbability}% szansy na deszcz`);
-    })
-    .catch((error) => {
-        console.log(error);
-    });
+app.get('/about', function (req, res) {
+    return res.render('views/about', { title: 'About' })
+});
+
+app.get('/help', function (req, res) {
+    return res.render('views/help', { title: 'Help' })
+});
+
+app.listen(3000, () => {
+    console.log("Server is up on port 3000");
+});
 
 
 
