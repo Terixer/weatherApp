@@ -8,6 +8,8 @@ const viewsDirectory = './templates';
 
 
 const app = express()
+const port = process.env.PORT || 3000 //for Heroku
+
 app.set('view engine', 'pug')
 app.set('views', viewsDirectory)
 
@@ -54,8 +56,8 @@ app.get('/help', function (req, res) {
     return res.render('views/help', { title: 'Help' })
 });
 
-app.listen(3000, () => {
-    console.log("Server is up on port 3000");
+app.listen(port, () => {
+    console.log("Server is up on port " + port);
 });
 
 
